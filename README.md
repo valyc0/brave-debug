@@ -57,6 +57,71 @@ Questo comando:
   - Autenticazione disabilitata
   - Debugging remoto abilitato sulla porta 9222
 
+### Accesso con credenziali predefinite
+
+Quando l'autenticazione è abilitata in Kasm ma non sono specificate credenziali personalizzate, puoi accedere usando le credenziali predefinite:
+
+- **Username:** `kasm_user`
+- **Password:** `password`
+
+Per accedere:
+1. Apri un browser sul tuo computer host
+2. Naviga a `http://localhost:6901`
+3. Inserisci `kasm_user` come username e `password` come password
+4. Clicca su "Accedi" o "Log In"
+
+Queste credenziali sono impostate come valori predefiniti nell'immagine Kasm di base.
+
+### Configurazione di Autenticazione in Kasm
+
+Nella configurazione predefinita, l'autenticazione è disabilitata per semplicità (`DISABLE_AUTHENTICATION=1`). Per abilitare l'autenticazione e specificare username e password personalizzati, modifica lo script `start-brave-debug.sh` come segue:
+
+1. **Rimuovi** la linea:
+   ```
+   -e DISABLE_AUTHENTICATION=1 \
+   ```
+
+2. **Aggiungi** invece queste variabili di ambiente:
+   ```
+   -e KASM_USER=mio_username \
+   -e KASM_PASSWORD=mia_password \
+   ```
+
+Esempio completo:
+```bash
+docker run -d --name brave-debug \
+  --network=host \
+  --shm-size=512m \
+  -e KASM_PORT=6901 \
+  -e KASM_USER=mio_username \
+  -e KASM_PASSWORD=mia_password \
+  -e ENABLE_REMOTE_DEBUGGING=true \
+  -e REMOTE_DEBUGGING_PORT=9222 \
+  -e REMOTE_DEBUGGING_ADDRESS=0.0.0.0 \
+  -e CHROME_ARGS="--no-sandbox --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222" \
+  brave-debug
+```
+
+Puoi anche configurare il tipo di autenticazione usando le seguenti opzioni:
+
+- **Standard username/password**:
+  ```
+  -e KASM_USER=mio_username \
+  -e KASM_PASSWORD=mia_password \
+  ```
+
+- **VNC password (interfaccia grafica)**:
+  ```
+  -e VNC_PW=mia_password_vnc \
+  ```
+
+- **Token-based authentication**:
+  ```
+  -e KASM_AUTH_TOKEN=mio_token_segreto \
+  ```
+
+Dopo aver modificato lo script e aver avviato il container, accedi all'interfaccia Kasm su http://localhost:6901 e inserisci le credenziali configurate.
+
 ### Accesso al browser
 
 - **Interfaccia browser:** https://localhost:6901
@@ -115,5 +180,9 @@ python test_login.py
 ## Note di sicurezza
 
 - Il container viene avviato con `--no-sandbox` per semplicità in ambiente di test
-- L'autenticazione è disabilitata (`DISABLE_AUTHENTICATION=1`)
-- NON utilizzare questa configurazione in ambienti di produzione o esposti su Internet
+- Nella configurazione predefinita, l'autenticazione è disabilitata (`DISABLE_AUTHENTICATION=1`)
+- Per ambienti di produzione o condivisi:
+  - Abilita sempre l'autenticazione come descritto sopra
+  - Considera l'utilizzo di credenziali forti e token di autenticazione
+  - Valuta la possibilità di limitare l'accesso alla porta 9222 solo a indirizzi IP specifici
+- NON esporre le porte 6901 e 9222 direttamente su Internet senza adeguate misure di sicurezza

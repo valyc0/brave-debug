@@ -19,7 +19,7 @@ docker run -d --name brave-debug \
   brave-debug
 
 echo "Container brave-debug started with network=host."
-echo "Access via: http://localhost:6901"
+echo "Access via: https://localhost:6901"
 echo "Remote debugging available at: http://localhost:9222/json"
 echo ""
 echo "NOTE: If you have connection issues, verify that no local services are using the same ports."
