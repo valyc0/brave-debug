@@ -59,7 +59,7 @@ Questo comando:
 
 ### Accesso al browser
 
-- **Interfaccia browser:** http://localhost:6901
+- **Interfaccia browser:** https://localhost:6901
 - **Endpoint debugging:** http://localhost:9222
 - **Dettagli debugging:** http://localhost:9222/json/list
 
