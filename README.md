@@ -17,8 +17,6 @@ Questo progetto fornisce un ambiente containerizzato per eseguire il browser Bra
 - `Dockerfile`: Configurazione per costruire l'immagine Docker
 - `build-brave-debug.sh`: Script per compilare l'immagine
 - `start-brave-debug.sh`: Script per avviare il container
-- `test_login.py`: Script di esempio per testare un form di login
-- `login.html` e `welcome.html`: Pagine di esempio per il test di login
 - `brave-install-scripts/`: Script di installazione per Brave
 - `custom_startup.sh`: Script personalizzato per avviare Brave con le opzioni di debugging
 
@@ -138,9 +136,8 @@ Il container espone il Chrome DevTools Protocol sulla porta 9222, consentendo:
    - Seleziona una scheda per ispezionarla
 
 2. **Automazione via script:**
-   - Usa lo script `test_login.py` come esempio
    - Comunica con il browser via WebSocket
-   - Esempio: `python test_login.py`
+   - Utilizza il Chrome DevTools Protocol per l'automazione
 
 3. **Comandi rapidi con curl:**
    ```bash
@@ -150,20 +147,6 @@ Il container espone il Chrome DevTools Protocol sulla porta 9222, consentendo:
    # Apri un nuovo URL
    curl -X PUT "http://localhost:9222/json/new?http://example.com"
    ```
-
-## Esempio di automazione
-
-Lo script `test_login.py` dimostra come:
-1. Connettersi al browser via WebSocket
-2. Navigare a una pagina di login (`login.html`)
-3. Compilare automaticamente i campi username e password
-4. Fare clic sul pulsante di login
-5. Verificare la navigazione alla pagina di benvenuto (`welcome.html`)
-
-Per eseguirlo:
-```bash
-python test_login.py
-```
 
 ## Struttura della rete
 
@@ -186,3 +169,73 @@ python test_login.py
   - Considera l'utilizzo di credenziali forti e token di autenticazione
   - Valuta la possibilità di limitare l'accesso alla porta 9222 solo a indirizzi IP specifici
 - NON esporre le porte 6901 e 9222 direttamente su Internet senza adeguate misure di sicurezza
+
+# Browser Network Monitor
+
+Uno strumento per monitorare il traffico di rete e i log della console di un browser Chrome/Brave in modalità debug.
+
+## Prerequisiti
+
+- Python 3.8+
+- Chrome o Brave Browser avviato in modalità debug
+- pip per installare le dipendenze
+
+## Dipendenze Python
+
+```bash
+pip install pyppeteer aiohttp
+```
+
+## Avvio del browser in modalità debug
+
+Per Chrome:
+```bash
+google-chrome --remote-debugging-port=9222
+```
+
+Per Brave:
+```bash
+brave --remote-debugging-port=9222
+```
+
+## Utilizzo dello script
+
+1. Clonare il repository
+2. Installare le dipendenze
+3. Avviare il browser in modalità debug
+4. Eseguire lo script:
+
+```bash
+python3 monitor_browser.py
+```
+
+Lo script:
+- Si connette al browser tramite Chrome DevTools Protocol
+- Monitora tutte le richieste di rete (headers, body, response)
+- Cattura i log della console (info, warning, error)
+- Salva tutti i log nel file browser_logs.txt
+
+Per visualizzare i log in tempo reale mentre vengono generati:
+```bash
+tail -f browser_logs.txt
+```
+
+## Output
+
+Lo script mostrerà:
+- Richieste HTTP/HTTPS con headers e body
+- Risposte con headers e body (se JSON)
+- Console logs (info, warning, error)
+- Errori JavaScript non gestiti
+- Promise rejections non gestite
+
+I log vengono salvati in `browser_logs.txt` nel formato:
+```
+[timestamp] TIPO_LOG: contenuto
+```
+
+## Note
+
+- Non interferisce con l'uso normale del browser
+- Funziona con qualsiasi applicazione web
+- Utile per debug e monitoraggio in development
